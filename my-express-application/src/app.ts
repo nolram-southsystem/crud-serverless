@@ -13,8 +13,6 @@ class App {
     private middleware(): void {
         this.app.use(bodyParser.json({ strict: false }));
         this.app.use(routes);
-        // this.express.use(logger('dev'));
-        // this.express.use(bodyParser.urlencoded({ extended: false }));
     }
 }
 

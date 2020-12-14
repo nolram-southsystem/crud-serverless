@@ -57,6 +57,18 @@ const serverlessConfiguration: AWS = {
         }
       ]
     },
+    getUsers: {
+      handler: 'src/server.handler',
+      memorySize: 128,
+      events: [
+        {
+          http: {
+            method: 'get',
+            path: '/users',
+          }
+        }
+      ]
+    },
     createUser: {
       handler: 'src/server.handler',
       memorySize: 128,
