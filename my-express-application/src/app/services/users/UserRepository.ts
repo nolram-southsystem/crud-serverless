@@ -5,7 +5,7 @@ import { v1 } from 'uuid';
 
 import { DynamoDbConnection } from '../../../infra/database/DynamoDB';
 
-export class CreateUser {
+export class UserRepository {
     private USERS_TABLE: string = process.env.USERS_TABLE;
     private dynamoDb: DynamoDbConnection;
 
@@ -13,7 +13,19 @@ export class CreateUser {
         this.dynamoDb = new DynamoDbConnection();
     }
 
-    public createUser(name: string, type: string, birthday?: Date): User {
+    public getUsers(): Promise<any> {
+        const promise = this.dynamoDb.getItems(
+            this.USERS_TABLE,
+            'userId, #name, birthday, #type'
+        );
+        return promise;
+    }
+
+    public createUser(
+        name: string,
+        type: string,
+        birthday?: Date
+    ): Promise<any> {
         const accountType = this.getType(type);
         const user: User = {
             userId: v1(),
@@ -22,9 +34,9 @@ export class CreateUser {
             birthday: birthday
         };
 
-        this.dynamoDb.insertItem(this.USERS_TABLE, user);
+        const promise = this.dynamoDb.insertItem(this.USERS_TABLE, user);
 
-        return user;
+        return promise;
     }
 
     private getType(type: string): AccountTypes {

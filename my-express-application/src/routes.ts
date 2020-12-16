@@ -2,8 +2,7 @@
 
 import express, { Request, Response } from 'express';
 
-import { CreateUser } from './app/services/users/CreateUser';
-import { GetUser } from './app/services/users/GetUser';
+import { UserRepository } from './app/services/users/UserRepository';
 
 import { User } from './domain/entities/users';
 
@@ -23,18 +22,29 @@ router.post('/users', (request: Request, response: Response) => {
     } else if (typeof name !== 'string') {
         response.status(400).json({ error: '"name" must be a string' });
     }
-    const createUser: CreateUser = new CreateUser();
+    const userRepository: UserRepository = new UserRepository();
 
-    const user: User = createUser.createUser(name, type, birthday);
-    response.status(200).json(user);
+    const promise: Promise<any> = userRepository.createUser(
+        name,
+        type,
+        birthday
+    );
+
+    promise
+        .then((data) => {
+            response.status(200).json(data);
+        })
+        .catch((err: string) => {
+            console.error(err);
+        });
 });
 
 router.get('/users', (request: Request, response: Response) => {
-    const getUser: GetUser = new GetUser();
-    const promise = getUser.getUsers();
+    const userRepository: UserRepository = new UserRepository();
+    const promise = userRepository.getUsers();
     promise
         .then((data) => {
-            let users: User[] = [];
+            const users: User[] = [];
             data.Items.forEach((element) => {
                 const user: User = {
                     userId: element.userId,
@@ -42,7 +52,6 @@ router.get('/users', (request: Request, response: Response) => {
                     type: element.type,
                     birthday: element.birthday
                 };
-                // console.log(user);
                 users.push(user);
             });
             response.status(200).json(users);

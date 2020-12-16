@@ -17,16 +17,13 @@ export class DynamoDbConnection {
         }
     }
 
-    public insertItem(tableName: string, item: any): any {
+    public async insertItem(tableName: string, item: any): Promise<any> {
         const params: DynamoDB.DocumentClient.PutItemInput = {
             TableName: tableName,
             Item: item
         };
-        this.dynamodb.put(params, (error) => {
-            if (error) {
-                console.log(error);
-            }
-        });
+        const result = this.dynamodb.put(params).promise();
+        return result;
     }
 
     public async getItems(tableName: string, fields: string): Promise<any> {
